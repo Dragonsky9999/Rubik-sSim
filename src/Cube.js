@@ -1,5 +1,5 @@
-import { moveDefs } from "./moveDefs.js";
-
+import { moveDefs } from "./moveDefs.js"
+import { Cubies } from "./cubies.js"
 
 export class Cube {
     constructor(){
@@ -14,11 +14,8 @@ export class Cube {
         this.cornerSize = 8;
         this.edgeSize = 12;
         this.centerSize = 6;
-    }
 
-    move(m){
-        const move = moveDefs[m];
-        this.applyMove(move);
+        this.Cubies = new Cubies()
     }
 
     applyMove(moveName){

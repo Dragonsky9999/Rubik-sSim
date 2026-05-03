@@ -8,10 +8,10 @@ const sceneContainer = document.getElementById("sceneContainer");
 const cube = new Cube();
 const renderer = new Renderer(sceneContainer);
 
-renderer.buildCubies(cube)
 
 function loop(){
     renderer.animate(cube)
+    renderer.processQueue(cube)
     requestAnimationFrame(loop)
 }
 
@@ -33,13 +33,12 @@ const keyMap = {
 }
 
 document.addEventListener("keydown", e => {
-    const move = keyMap[e.key]
-    if (!move) return
-
-    renderer.queue.push(move)
-    renderer.processQueue(cube)
+    const key = keyMap[e.key]
+    if (key == "q") renderer.quit()
+    if (!key) return
     
+    
+    renderer.queue.push(key)
 })
-
 
 

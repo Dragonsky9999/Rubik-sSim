@@ -1,9 +1,9 @@
 import * as THREE from "three"
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import { createCubieMesh,createMat } from "./cubiemesh.js"
-import { BuildCubies } from "../src/BuildCubies.js";
 import { moveDefs } from "../src/moveDefs.js";
 import { Animator } from "./Animate.js";
+import { Cubies } from "../src/cubies.js";
+import { Mesh } from "./mesh.js"
 
 export class Renderer {
     constructor(container){
@@ -34,8 +34,8 @@ export class Renderer {
         this.controls.dampingFactor = 0.05
 
         // -- cubie -- //
-        this.cubies = []
-        this.meshes = []
+        // this.cubies = []
+        this.Mesh = new Mesh(this.scene)
 
         // -- animator -- //
         this.animator = new Animator(this.scene,this.cube,this.renderer)
@@ -44,11 +44,18 @@ export class Renderer {
         this.queue = []
 
         this.isMovinng = false
-        // -- start loop -- //
-        this.animate = this.animate.bind(this)
+
+        // -- start loop -- //]
+        this.Mesh.init()
+        this.Mesh.meshes.forEach(mesh => this.scene.add(mesh))
+
+        
+        // this.animate = this.animate.bind(this)
+
     }
 
     async processQueue(cube){
+
         if (this.animator.isMovinng) return
         this.animator.isMoving = true
 
@@ -56,6 +63,8 @@ export class Renderer {
             const move = this.queue.shift()
             await this.animateMove(moveDefs[move])
             cube.applyMove(move)
+            cube.Cubies.update(cube)
+            this.Mesh.update(cube.Cubies)
         }
 
         this.animator.isMoving = false
@@ -71,16 +80,20 @@ export class Renderer {
         const group = new THREE.Group()
         this.scene.add(group)
 
-        const targets = this.meshes.filter(m => def.layer(m))
+        const targets = this.Mesh.meshes.filter(m => def.layer(m))
 
         // groupに入れる
         targets.forEach(m => group.attach(m))
 
-        // ---- 回転軸（とりあえずR想定）----
         const axis = new THREE.Vector3(...def.axis)
 
         const duration = 250
         const start = performance.now()
+
+            const sound = new Audio("/sounds/move.m4a")
+            sound.playbackRate = 0.95 + Math.random() * 0.1
+            sound.currentTime = 0
+            sound.play()
 
         const animate = (time) => {
 
@@ -98,7 +111,7 @@ export class Renderer {
             } else {
 
                 // ---- 終了処理 ----
-
+                group.rotateOnAxis(axis,-def.angle)
                 targets.forEach(m => this.scene.attach(m))
                 this.scene.remove(group)
 
@@ -114,67 +127,15 @@ export class Renderer {
     // -- loop -- //
     animate(cube) {
         this.controls.update()
-        this.update(cube)
+        // this.update(cube)
         this.renderer.render(this.scene, this.camera)
     }
 
-    // -- 最初にキュービーをつくる -- //
-    buildCubies(cube){
-        this.cubies = BuildCubies(cube)
-
-        const meshes = createCubieMesh(this.cubies)
-        this.meshes = (meshes)
-        for (let i = 0; i < this.cubies.length; i++){
-            const cubie = this.cubies[i]
-            const mesh = this.meshes[i]
-
-            mesh.position.set(...cubie.pos)
-            this.scene.add(mesh)
-        }
-    }
-
-
-    sync(cube) {
-        for (let i = 0; i < this.cubies.length; i++) {
-
-            const cubie = this.cubies[i]   // state側
-            const mesh = this.meshes[i]    // render側
-
-            mesh.position.set(
-                cubie.pos[0],
-                cubie.pos[1],
-                cubie.pos[2]
-            )
-    }
-}
-    // -- 回転アニメーション -- //
-
-    // -- リアルタイム更新 -- //
-    update(cube){
-        const cornerCubies = this.cubies.filter(c => c.type == "corner")
-        const edgeCubies = this.cubies.filter(c => c.type == "edge")
-        const centerCubies = this.cubies.filter(c => c.type == "center")
-        for (let i=0; i<cube.state.CP.length; i++){
-            cornerCubies[i].where = cube.state["CP"][i]
-            cornerCubies[i].ori = cube.state["CO"][i]
-            this.cubies = [...cornerCubies,...edgeCubies,...centerCubies]
-        }
-        for (let i=0; i<cube.state.EP.length; i++){
-            edgeCubies[i].where = cube.state["EP"][i]
-            edgeCubies[i].ori = cube.state["EO"][i]
-            this.cubies = [...cornerCubies,...edgeCubies,...centerCubies]
-        }
-        for (let i=0; i<cube.state.CenterP.length; i++){
-            centerCubies[i].where = cube.state["CenterP"][i]
-            this.cubies = [...cornerCubies,...edgeCubies,...centerCubies]
-        }
-        for (let i=0; i<this.cubies.length; i++){
-            const cubie = this.cubies[i]
-            const mesh = this.meshes[i]
-            const newMeshMat = createMat(this.cubies,cubie.type,cubie.index)
-
-            mesh.material = newMeshMat
-        }
+    quit(){
+        this.renderer.dispose()
+        this.scene.clear()
+        this.controls.dispose()
+        this.renderer.domElement.remove()
     }
 }
 
