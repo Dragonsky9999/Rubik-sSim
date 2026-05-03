@@ -1,5 +1,6 @@
 import { moveDefs } from "./moveDefs.js";
 
+
 export class Cube {
     constructor(){
         this.state = {
@@ -9,6 +10,10 @@ export class Cube {
             EO: [0,0,0,0,0,0,0,0,0,0,0,0],
             CenterP: [0,1,2,3,4,5]
         }
+
+        this.cornerSize = 8;
+        this.edgeSize = 12;
+        this.centerSize = 6;
     }
 
     move(m){
@@ -16,7 +21,8 @@ export class Cube {
         this.applyMove(move);
     }
 
-    applyMove(move){
+    applyMove(moveName){
+        const move = moveDefs[moveName]
         const corner = UpdateState(this.state.CP, this.state.CO, move.CP, move.CO, 3);
         const edge = UpdateState(this.state.EP, this.state.EO, move.EP, move.EO, 2);
 
@@ -48,6 +54,9 @@ export class Cube {
             EO: [0,0,0,0,0,0,0,0,0,0,0,0],
             CenterP: [0,1,2,3,4,5]
         }
+    }
+    reset(state){
+        this.state = state
     }
 }
 
