@@ -1,7 +1,6 @@
 import * as THREE from "three"
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { moveDefs } from "../src/moveDefs.js";
-import { Animator } from "./Animate.js";
 import { Cubies } from "../src/cubies.js";
 import { Mesh } from "./mesh.js"
 
@@ -9,7 +8,7 @@ export class Renderer {
     constructor(container){
         // -- scene -- //
         this.scene = new THREE.Scene()
-        this.scene.background = new THREE.Color(0x0104f)
+        this.scene.background = null
 
         // -- camera -- //
         this.camera = new THREE.PerspectiveCamera(
@@ -20,9 +19,22 @@ export class Renderer {
         )
         this.camera.position.set(3, 3, 5)
 
+        // -- light -- //
+        const light = new THREE.DirectionalLight(0xffffff, 1.5);
+        light.position.set(3, 3, 3);
+        this.scene.add(light);
+        const ambient = new THREE.AmbientLight(0xffffff, 5)
+        this.scene.add(ambient)
+
         // -- renderer -- //
-        this.renderer = new THREE.WebGLRenderer({ antialias: true })
+        this.renderer = new THREE.WebGLRenderer({   
+            alpha: true,
+            antialias: true 
+        })
+
         this.renderer.setSize(container.clientWidth, container.clientHeight)
+        this.renderer.setClearColor(0x000000, 0); // ←完全透明
+
 
         this.renderer.domElement.id = "canvas"
         container.appendChild(this.renderer.domElement)
@@ -36,9 +48,6 @@ export class Renderer {
         // -- cubie -- //
         // this.cubies = []
         this.Mesh = new Mesh(this.scene)
-
-        // -- animator -- //
-        this.animator = new Animator(this.scene,this.cube,this.renderer)
 
         // -- queue -- //
         this.queue = []
@@ -56,27 +65,25 @@ export class Renderer {
 
     async processQueue(cube){
 
-        if (this.animator.isMovinng) return
-        this.animator.isMoving = true
+        if (this.isMoving) return
+        this.isMoving = true
 
         while (this.queue.length > 0) {
             const move = this.queue.shift()
+            console.log(move)
             await this.animateMove(moveDefs[move])
             cube.applyMove(move)
             cube.Cubies.update(cube)
             this.Mesh.update(cube.Cubies)
         }
+        this.isMoving = false
 
-        this.animator.isMoving = false
     }
 
     animateMove(move) {
     const def = move.render
     return new Promise((resolve) => {
-        
-        if (this.isMoving) return
-        this.isMoving = true
-
+    
         const group = new THREE.Group()
         this.scene.add(group)
 
@@ -90,36 +97,37 @@ export class Renderer {
         const duration = 250
         const start = performance.now()
 
-            const sound = new Audio("/sounds/move.m4a")
-            sound.playbackRate = 0.95 + Math.random() * 0.1
-            sound.currentTime = 0
-            sound.play()
+        // 音
+        const sound = new Audio("./sounds/move.m4a")
+        sound.playbackRate = 0.95 + Math.random() * 0.1
+        sound.currentTime = 0
+        sound.play()
+
+        let prevAngle = 0
 
         const animate = (time) => {
 
             const t = (time - start) / duration
             const progress = Math.min(t, 1)
 
-            // 90度まで回す
-            const angle = progress * def.angle
+            const current = progress * def.angle
+            const delta = current - prevAngle
 
-            group.rotation.set(0, 0, 0)
-            group.rotateOnAxis(axis, angle)
+            group.rotateOnAxis(axis, delta)
+
+            prevAngle = current
 
             if (progress < 1) {
                 requestAnimationFrame(animate)
             } else {
 
-                // ---- 終了処理 ----
-                group.rotateOnAxis(axis,-def.angle)
+                group.rotateOnAxis(axis, -def.angle)
                 targets.forEach(m => this.scene.attach(m))
                 this.scene.remove(group)
 
-                this.isMoving = false
                 resolve()
             }
         }
-
         requestAnimationFrame(animate)
     })
 }
