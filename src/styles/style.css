@@ -3,28 +3,35 @@ html, body {
   padding: 0;
   width: 100%;
   height: 100vh;
+  justify-content: center;
 }
 
-
 .sceneContainerParents {
-    display: flex;
-    gap: 20px;
-    justify-content: center;
-    background-color: violet;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-wrap: wrap;
+  padding: 0;
+  margin: 0;
+  justify-content: center;
+  background-color: violet;
 }
 
 .sceneContainer {
-    width: 500px;
-    height: 500px;
-    margin: 0;
-    padding: 0;
-    background: transparent;
+  position: relative;
+  width: 500px;
+  height: 400px;
+  margin: 0;
+  padding: 0;
+  background: transparent;
 }
 
 .canvas {
-    background: transparent;
-    left: 0;
-    z-index: 10;
+  width: 500px;
+  height: 500px;
+  background: transparent;
+  left: 0;
+  z-index: 10;
 }
 
 img {
@@ -32,4 +39,12 @@ img {
   top: 0;
   left: 0;
   z-index: 1;
+}
+
+#frontFaceIndicator {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 15%;
+  height: 20%;
 }

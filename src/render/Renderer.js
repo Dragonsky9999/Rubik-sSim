@@ -36,7 +36,6 @@ export class Renderer {
         this.renderer.setSize(container.clientWidth, container.clientHeight)
         this.renderer.setClearColor(0x000000, 0); // ←完全透明
 
-
         this.renderer.domElement.class = "canvas"
         container.appendChild(this.renderer.domElement)
 
@@ -47,12 +46,31 @@ export class Renderer {
         this.controls.enablePan = false;
 
         // -- cubie -- //
-        // this.cubies = []
         this.Mesh = new Mesh(this.scene)
+        this.bestFace = null
 
         // -- 初期mesh生成 -- //
         this.Mesh.init()
         this.Mesh.meshes.forEach(mesh => this.scene.add(mesh))
+    }
+    
+    getFrontFace(){
+        const camDir = new THREE.Vector3()
+        this.camera.getWorldDirection(camDir)
+        camDir.normalize()
+        
+        let bestScore = Infinity
+        
+        for (const [face, normal] of Object.entries(FACE_NORMALS)){
+            const score = camDir.dot(normal)
+            
+            if (score < bestScore) {
+                bestScore = score
+                this.bestFace = face
+            }
+        }
+
+        return this.bestFace
     }
 
     animateMove(def){
@@ -110,9 +128,10 @@ export class Renderer {
 }
 
     // -- loop -- //
-    loop() {
+    loop(){
         this.controls.update()
         this.renderer.render(this.scene, this.camera)
+        this.getFrontFace()
     }
 
     quit(){
@@ -123,3 +142,9 @@ export class Renderer {
     }
 }
 
+const FACE_NORMALS = {
+    0: new THREE.Vector3(1, 0, 0),
+    1: new THREE.Vector3(-1, 0, 0),
+    4: new THREE.Vector3(0, 0, 1),
+    5: new THREE.Vector3(0, 0, -1)
+}

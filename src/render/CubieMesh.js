@@ -43,7 +43,7 @@ export class Mesh {
                 let colors = [black,black,black,black,black,black]
     
                 const cubie = state[n][i]
-                const geo = new RoundedBoxGeometry(0.98,0.98,0.98,0,0.1)
+                const geo = new RoundedBoxGeometry(0.98,0.98,0.98,2,0.1)
     
                 cubie.faces.forEach((axis, i) => {
                     colors[AxisMap[axis]] = colorMap[cubie.colors[i]]
