@@ -52,9 +52,7 @@ export class Cube {
             CenterP: [0,1,2,3,4,5]
         }
     }
-    reset(state){
-        this.state = state
-    }
+
 }
 
 function applyPermutationWithOrientation(OldPos,OldOri, movePos, moveOri, mod){

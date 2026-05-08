@@ -8,7 +8,7 @@ export class CubeController {
         
         if (enableKeyboard) {
             this.input = new InputController(this.orchestrator)
-            window.addEventListener("keydown", e => this.input.handleKeyDown(e,this.frontIndex))
+            window.addEventListener("keydown", e => this.input.handleKeyDown(e,this.orchestrator.frontIndex))
             window.addEventListener("keyup", e => this.input.handleKeyUp(e))
         }
         if (RenderFrontFace) {
@@ -16,18 +16,26 @@ export class CubeController {
             frontFaceIndicator.id = "frontFaceIndicator"
             sceneContainer.appendChild(frontFaceIndicator)
 
-            this.frontFaceIndicator = frontFaceIndicator
+            this.orchestrator.frontFaceIndicator = frontFaceIndicator
         }
-        
+
+        this.isRunning = false        
+    }
+
+    reset(){
+        this.stop()
+        this.orchestrator.reset()
+        this.start()
+    }
+
+    start(){
+        this.orchestrator.isRunning = true
+        this.orchestrator.isProcessing = true
+        this.orchestrator.loop()
     }
     
-    loop(){
-        this.orchestrator.renderer.loop()
-        this.frontIndex = this.orchestrator.renderer.bestFace
-        this.face = this.orchestrator.cube.state.CenterP[this.frontIndex]
-        
-        if (this.frontFaceIndicator) updateFrontFace(this.face,this.frontFaceIndicator)
-        
-        requestAnimationFrame(() => this.loop())
+    stop(){
+        this.orchestrator.isRunning = false
+        this.orchestrator.isProcessing = false
     }
 }

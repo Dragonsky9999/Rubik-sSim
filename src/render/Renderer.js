@@ -72,63 +72,63 @@ export class Renderer {
 
         return this.bestFace
     }
-
-    animateMove(def){
-    return new Promise((resolve) => {
-        
-        // 音
-        const sound = new Audio("./sounds/move.m4a")
-        sound.playbackRate = 0.95 + Math.random() * 0.1
-        sound.currentTime = 0
-        sound.play()
     
-        const group = new THREE.Group()
-        this.scene.add(group)
+    animateMove(def){
+        return new Promise((resolve) => {
 
-        const targets = this.Mesh.meshes.filter(m => def.layer(m))
+            // 音
+            const sound = new Audio("./sounds/move.m4a")
+            sound.playbackRate = 0.95 + Math.random() * 0.1
+            sound.currentTime = 0
+            sound.play()
+        
+            const group = new THREE.Group()
+            this.scene.add(group)
 
-        // groupに入れる
-        targets.forEach(m => group.attach(m))
+            const targets = this.Mesh.meshes.filter(m => def.layer(m))
 
-        const axis = new THREE.Vector3(...def.axis)
+            // groupに入れる
+            targets.forEach(m => group.attach(m))
 
-        const duration = 250
-        const start = performance.now()
+            const axis = new THREE.Vector3(...def.axis)
 
-        let prevAngle = 0
+            const duration = 250
+            const start = performance.now()
 
-        const animate = (time) => {
+            let prevAngle = 0
 
-            const t = (time - start) / duration
-            const progress = Math.min(t, 1)
+            const animate = (time) => {
 
-            const base = 0.5 - 0.5 * Math.cos(Math.PI * progress)
-            const eased = 1 - Math.pow(1 - base, 1.5)
+                const t = (time - start) / duration
+                const progress = Math.min(t, 1)
 
-            const current = eased * def.angle
-            const delta = current - prevAngle
+                const base = 0.5 - 0.5 * Math.cos(Math.PI * progress)
+                const eased = 1 - Math.pow(1 - base, 1.5)
 
-            group.rotateOnAxis(axis, delta)
+                const current = eased * def.angle
+                const delta = current - prevAngle
 
-            prevAngle = current
+                group.rotateOnAxis(axis, delta)
 
-            if (progress < 1) {
-                requestAnimationFrame(animate)
-            } else {
+                prevAngle = current
 
-                group.rotateOnAxis(axis, -def.angle)
-                targets.forEach(m => this.scene.attach(m))
-                this.scene.remove(group)
+                if (progress < 1) {
+                    requestAnimationFrame(animate)
+                } else {
 
-                resolve()
+                    group.rotateOnAxis(axis, -def.angle)
+                    targets.forEach(m => this.scene.attach(m))
+                    this.scene.remove(group)
+
+                    resolve()
+                }
             }
-        }
-        requestAnimationFrame(animate)
-    })
-}
+            requestAnimationFrame(animate)
+        })
+    }
 
     // -- loop -- //
-    loop(){
+    updateRenderer(){
         this.controls.update()
         this.renderer.render(this.scene, this.camera)
         this.getFrontFace()
