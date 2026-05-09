@@ -19,6 +19,7 @@ export class Renderer {
             1000
         )
         this.camera.position.set(3, 3, 5)
+        console.log(container.clientWidth,container.clientHeight)
 
         // -- light -- //
         const light = new THREE.DirectionalLight(0xffffff, 1.5);

@@ -14,6 +14,7 @@ export class CubeController {
         if (RenderFrontFace) {
             const frontFaceIndicator = document.createElement("div")
             frontFaceIndicator.id = "frontFaceIndicator"
+            frontFaceIndicator.className = "frontFaceIndicator"
             sceneContainer.appendChild(frontFaceIndicator)
 
             this.orchestrator.frontFaceIndicator = frontFaceIndicator

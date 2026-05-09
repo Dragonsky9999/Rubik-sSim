@@ -4,17 +4,430 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rubik's Cube Simulator</title>
-  <script type="module" crossorigin src="/Rubik-sSim/assets/index-Di7ZlPcL.js"></script>
-  <link rel="stylesheet" crossorigin href="/Rubik-sSim/assets/index-Cn4qG8ok.css">
+  <script type="module" crossorigin src="/Rubik-sSim/assets/index-BHVEKgpz.js"></script>
+  <link rel="stylesheet" crossorigin href="/Rubik-sSim/assets/index-DQMbXkvo.css">
 </head>
 <body>
-    <button id="resetBtn">reset</button>
-    <button id="scramble">scramble</button>
-    <button id="undo">undo</button>
-    <button id="stopMove">stop</button>
-    <button id="redo">redo</button>
     <div id="sceneContainerParents" class="sceneContainerParents">
-        <div id="sceneContainer" class="sceneContainer"></div>
+        <div id="sceneContainer" class="sceneContainer">
+        </div>
+        <button id="resetBtn">reset</button>
+        <button id="scramble">scramble</button>
+        <button id="undo">undo</button>
+        <button id="stopMove">stop</button>
+        <button id="redo">redo</button>
+    </div>
+
+    <div class="guide">
+        <section class="card">
+
+            <h1>概要</h1>
+
+            <div class="content">
+
+                <p>
+                    このプロジェクトは、
+                    ルービックキューブアプリ開発の基盤として制作している
+                    3Dキューブシミュレータです。
+                </p>
+                <p>
+                    現在は、
+                    回転処理・アニメーション・入力操作・
+                    Undo / Redo などのコアシステムに加え、
+                    視点に応じた直感的な回転操作を実装しています。
+
+                </p>
+                <p>
+                    内部では move ベースで状態を管理しており、
+                    現在の視点から自然に操作できる構造になっています。
+                </p>
+                <p>
+                    今後は、
+                    PLL Trainer や各種トレーニング機能など、
+                    アプリとしての拡張を予定しています。
+                </p>
+
+            </div>
+
+        </section>
+
+        <section class="card">
+
+            <h1>基本操作</h1>
+
+            <div class="content">
+
+                <p>
+                    キー入力：
+                    <span class="key">U</span>
+                    <span class="key">D</span>
+                    <span class="key">F</span>
+                    <span class="key">B</span>
+                    <span class="key">R</span>
+                    <span class="key">L</span>
+                    <span class="key">M</span>
+                    <span class="key">E</span>
+                    <span class="key">S</span>
+                    <span class="key">X</span>
+                    <span class="key">Y</span>
+                    <span class="key">Z</span>
+                </p>
+
+                <p>
+                    キーを押すと各面が反時計回りに回転します。
+                </p>
+
+                <p>
+                <span class="key">Shift</span>
+                を押しながら入力すると時計回りになります。
+            </p>
+            <p>
+                
+                左上に表示されている色は、現在の F 面のセンター色を表しています。各キー入力は、この F 面を基準として処理されるため、視点に応じた直感的な回転操作が可能です。
+            </p>
+
+                <div class="example">
+                    <h3>例</h3>
+
+                    <p>
+                    <span class="key">U</span> → U
+                    </p>
+
+                    <p>
+                    <span class="key">Shift + R</span> → R'
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section class="card">
+
+            <h1>PLL</h1>
+
+            <div class="content">
+
+                <p>
+                    <span class="key">Space</span>
+                    を押しながらPLL名に対応するキーを入力します。
+                </p>
+
+                <p>
+                    矢印キーでPLLの種類を指定できます。
+                </p>
+
+                <div class="arrowMap">
+
+                    <div>
+                        <span class="key">←</span>
+                        = a
+                    </div>
+
+                    <div>
+                        <span class="key">↑</span>
+                        = b
+                    </div>
+
+                    <div>
+                        <span class="key">→</span>
+                        = c
+                    </div>
+
+                    <div>
+                        <span class="key">↓</span>
+                        = d
+                    </div>
+
+                </div>
+
+                <p>
+                    矢印キーを押さない場合は
+                    <strong>a</strong>
+                    扱いになります。
+                </p>
+
+                <div class="example">
+
+                    <h3>例</h3>
+
+                    <p>
+                        <span class="key">Space + T</span>
+                        → T Perm
+                    </p>
+
+                    <p>
+                        <span class="key">Space + U</span>
+                        → Ua Perm
+                    </p>
+
+                    <p>
+                        <span class="key">Space + ↑ + U</span>
+                        → Ub Perm
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section class="card">
+
+            <h1>機能</h1>
+
+            <div class="content">
+
+                <div class="feature">
+
+                    <div class="featureTitle">
+                        <span class="key">Reset</span>
+                    </div>
+
+                    <p>
+                        キューブを初期状態に戻します。
+                    </p>
+
+                </div>
+
+                <div class="feature">
+
+                    <div class="featureTitle">
+                        <span class="key">Scramble</span>
+                    </div>
+
+                    <p>
+                    ランダムな手順でキューブをシャッフルします。
+                    </p>
+                </div>
+
+                <div class="feature">
+
+                    <div class="featureTitle">
+                        <span class="key">Undo</span>
+                    </div>
+
+                    <p>
+                        直前の操作を取り消します。
+                    </p>
+                </div>
+
+                <div class="feature">
+
+                    <div class="featureTitle">
+                        <span class="key">Redo</span>
+                    </div>
+
+                    <p>
+                        Undoした操作をやり直します。
+                    </p>
+
+                </div>
+
+                <div class="feature">
+
+                    <div class="featureTitle">
+                        <span class="key">Stop</span>
+                    </div>
+
+                    <p>
+                        実行中の手順やアニメーションを停止します。再度押すと再生されます。
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <details class="memo">
+        
+            <summary>
+                構造 & 開発メモ
+            </summary>
+        
+            <div class="memoContent">
+            
+                <section>
+                
+                    <h2>現在の構造</h2>
+                
+                    <ul>
+                    
+                        <li>
+                            Cube が唯一の状態を保持
+                        </li>
+                    
+                        <li>
+                            Renderer は表示のみを担当
+                        </li>
+                    
+                        <li>
+                            Animator は回転アニメーションのみを担当
+                        </li>
+                    
+                        <li>
+                            Input は直接 Cube を変更しない
+                        </li>
+                    
+                        <li>
+                            Orchestrator が操作全体を制御
+                        </li>
+                    
+                        <li>
+                            すべての操作を cubeの状態として管理
+                        </li>
+                    
+                        <li>
+                            Undo / Redo は 回転履歴と、redoStack で実装
+                        </li>
+                    
+                        <li>
+                            視点回転は move 変換で処理
+                        </li>
+                    
+                    </ul>
+                
+                    </section>
+                
+                    <section>
+                    
+                        <h2>データの流れ</h2>
+                    
+                        <div class="flow">
+                        
+                            <div>Input</div>
+                        
+                            <span>↓</span>
+                            <div>convertMove</div>
+                            <span>↓</span>
+                        
+                            <div>Orchestrator</div>
+                        
+                            <span>↓        ↓</span>
+                        
+                            <div>Cube, Renderer</div>
+                        
+                        </div>
+                    
+                    </section>
+                    <section>
+                    
+                        <h2>フォルダ構造</h2>
+
+                            <div class="folderTree">
+                            
+                                <pre>
+                                sim
+                                │ 
+                                │ index.html
+                                ├─public
+                                │   ├─images
+                                │   ├─sounds
+                                │       │  move.m4a    
+                                ├─src
+                                │   │  main.js
+                                │   │
+                                │   ├─app
+                                │   │      CubeController.js
+                                │   │      index.js
+                                │   │      MoveOrchestrator.js
+                                │   │
+                                │   ├─domain
+                                │   │  │  index.js
+                                │   │  │
+                                │   │  └─cube
+                                │   │          Cube.js
+                                │   │          Cubies.js
+                                │   │          MoveDefs.js
+                                │   │          OllAlgorithms.js
+                                │   │          PllAlgorithms.js
+                                │   │
+                                │   ├─input
+                                │   │      convertMove.js
+                                │   │      index.js
+                                │   │      input.js
+                                │   │
+                                │   ├─render
+                                │   │      CubieMesh.js
+                                │   │      FrontFaceIndicator.js
+                                │   │      index.js
+                                │   │      Renderer.js
+                                │   │
+                                │   └─styles
+                                │           style.css
+                                </pre>
+                            
+                            </div>
+                        
+                        <ul>
+                        
+                            <li>
+                                <strong>app</strong>
+                                ：アプリ全体の制御
+                            </li>
+                        
+                            <li>
+                                <strong>domain</strong>
+                                ：キューブ状態・回転ロジック
+                            </li>
+                        
+                            <li>
+                                <strong>input</strong>
+                                ：キー入力・視点依存 move 変換
+                            </li>
+                        
+                            <li>
+                                <strong>render</strong>
+                                ：3D描画・UI表示
+                            </li>
+                        
+                            <li>
+                                <strong>styles</strong>
+                                ：CSS
+                            </li>
+                        
+                        </ul>
+                    
+                    </section>
+
+                    <section>
+                    
+                        <h2>残課題</h2>
+                    
+                        <ul>
+                        
+                            <li>
+                                MoveClass 実装
+                                <br>
+                                face / direction / amount を分離し、
+                                move の抽象化を行う
+                            </li>
+                        
+                            <li>
+                                モバイル対応
+                                <br>
+                                タッチ操作・UI配置・レスポンシブ対応
+                            </li>
+                        
+                        </ul>
+                    
+                    </section>
+
+                    <section>
+                    
+                        <h2>今後の拡張</h2>
+                    
+                        <ul>
+                        
+                            <li>PLL Trainer</li>
+                        
+                            <li>各種トレーニング機能</li>
+                        
+                            <li>多分割</li>
+                        
+                            <li>アルゴリズム表示</li>
+                        
+                        </ul>
+                    </section>
+                </div>
+            </details>
+        </div>
     </div>
 </body>
-</html>  
+</html>

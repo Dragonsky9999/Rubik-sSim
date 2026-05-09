@@ -11,7 +11,6 @@ export function convertMove(move, currentFrontFace){
 
     if (!suffix) return convertedMove
     return convertedMove + suffix
-
 }
 
 const convertTable = {
